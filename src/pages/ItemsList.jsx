@@ -1,21 +1,22 @@
 import ItemCard from '../components/ItemCard'
 import { useEffect, useState } from 'react'
 import { api } from '../api/api'
+import { useItemsStore } from '../../store/useItemsStore'
 
 const ItemsList = () => {
-    const [items, setItems] = useState([])
+    const {items, getItems} = useItemsStore()
     const [error, setError] = useState('')
     useEffect(() => {
-        async function getItems() {
+        async function loadItems() {
             setError("")
             try {
-                setItems((await api.getItems()).data)
+                getItems()
             } catch (error) {
-                setError(error.response.data.error)
                 console.error(error)
+                setError(error.response.data.error)
             }
         }
-        getItems()
+        loadItems()
     }, [])
 
     return (

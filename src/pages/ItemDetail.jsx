@@ -1,9 +1,14 @@
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import Input from "../components/Input"
 import Button from "../components/Button"
 
 const ItemDetail = () => {
-    const handleBid = () => {}
+
+    const {id} = useParams()
+    const handleBid = () => {
+
+    }
+    
     
     return (
         <div className="container">
