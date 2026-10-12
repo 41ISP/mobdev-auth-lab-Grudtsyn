@@ -42,6 +42,20 @@ const getItem = async (id) => {
     return res
 }
 
+const createBid = async ({id, amount}) => {
+    const res = await apiInstance.post(`/items/${id}`, amount)
+    return res.data
+}
+
+const deleteItems = async ({id}) => {
+    const res = await apiInstance.delete(`/items${id}`)
+    return res.data
+}
+
+const getItemBids = async (id) => {
+    const res = await apiInstance.get(`/items/${id}/bids`)
+    return res
+}
 
 export const api = {
     registerUser,
@@ -49,4 +63,7 @@ export const api = {
     getItems,
     sendItem,
     getItem,
+    createBid,
+    deleteItems,
+    getItemBids,
 }
