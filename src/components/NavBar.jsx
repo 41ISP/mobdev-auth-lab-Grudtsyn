@@ -6,9 +6,9 @@ const NavBar = () => {
         <div className="container">
             <header>
                 <nav>
-                    <a href="/" class="logo">
+                    <Link to="/" class="logo">
                         🛒 Маркетплейс
-                    </a>
+                    </Link>
 
                     <ul class="nav-links" id="guest-nav">
                         <li>

@@ -17,6 +17,8 @@ apiInstance.interceptors.request.use((config) => {
 
     return config
 })
+
+
 const registerUser = async (user) => {
     const res = await apiInstance.post("/auth/register", user)
     return res
@@ -43,7 +45,7 @@ const getItem = async (id) => {
 }
 
 const createBid = async ({id, amount}) => {
-    const res = await apiInstance.post(`/items/${id}`, amount)
+    const res = await apiInstance.post(`/items/${id}/bids`, {amount})
     return res.data
 }
 
@@ -57,6 +59,16 @@ const getItemBids = async (id) => {
     return res
 }
 
+const getStats = async () => {
+    const res = await apiInstance.get("/stats")
+    return res
+}
+
+const getMyBids = async () => {
+    const res = await apiInstance.get("/stats")
+    return res
+}
+
 export const api = {
     registerUser,
     loginUser,
@@ -66,4 +78,6 @@ export const api = {
     createBid,
     deleteItems,
     getItemBids,
+    getMyBids,
+    getStats,
 }

@@ -3,12 +3,20 @@ import { api } from "../src/api/api";
 
 export const useItemsStore = create((set) => ({
     item: null,
+    stats: null,
     items: [],
-    bids: [],
     getItems: async () => {
         try {
             const res = await api.getItems()
             set({items: res.data})
+        } catch(error) {
+            console.error(error)
+        }
+    },
+    getStats: async () => {
+        try {
+            const res = await api.getStats()
+            set({stats: res.data})
         } catch(error) {
             console.error(error)
         }

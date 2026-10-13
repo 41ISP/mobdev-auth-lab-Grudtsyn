@@ -7,16 +7,17 @@ import { useItemsStore } from "../../store/useItemsStore"
 
 const ItemDetail = () => {
     const { id } = useParams()
-    const item = useItemsStore((state) => state.item)
-    const getItem = useItemsStore((state) => state.getItem)
+    const [item, setItem] = useState(undefined)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(null)
+    const [bids, setBids] = useState([])
+    const [timerId, setTimerId] = useState(undefined)
 
     useEffect(() => {
         const load = async () => {
             setIsLoading(true)
             try {
-                await getItem(id)
+                setItem((await api.getItem(id)).data)
             } catch (error) {
                 setError(error.message || "Something went wrong")
                 console.error(error)
@@ -25,10 +26,29 @@ const ItemDetail = () => {
             }
         }
         const loadBids = async () => {
-            await api.getItemBids(id)
+            setIsLoading(true)
+            try {
+                setBids((await api.getItemBids(id)).data)
+            } catch (error) {
+                setError(error.message || "Something went wrong")
+                console.error(error)
+            } finally {
+                setIsLoading(false)
+            }
         }
         load()
         loadBids()
+        setTimerId(setInterval(() => {
+            (async () => {
+                try {
+                    setItem(await res.data)
+                } catch (error) { }
+            })()
+        }, 10000))
+        return () => {
+            clearInterval(timerId)
+        }
+
     }, [])
     const handleBid = async (e) => {
         e.preventDefault()
@@ -52,7 +72,11 @@ const ItemDetail = () => {
             <Link to={"/"}>← Вернуться к списку товаров</Link>
 
             <div className="item-detail">
-                {!isLoading && error && <p>{error}</p>}
+                {!isLoading && error && (
+                    <div className="alert alert-error active">
+                        {error}
+                    </div>
+                )}
                 {!isLoading && !error && item &&
                     (<><div className="item-header">
                         <div>
@@ -96,74 +120,38 @@ const ItemDetail = () => {
 
                         </div>
                     </div>
-                <div className="bids-section">
-                    <div className="bids-header">
-                        <h2 className="bids-title">История ставок</h2>
-                        <span className="bids-count">5</span>
-                </div>
-
-                    <div className="bids-list">
-                        <div className="bid-item highest-bid-item">
-                            <div className="bid-user">
-                                <div className="bid-avatar">BB</div>
-                                <div className="bid-details">
-                                    <span className="bid-username">buyer_best</span>
-                                    <span className="bid-time">2 часа назад</span>
-                                </div>
-                                <span className="highest-badge">🏆 Лидирует</span>
+                        <div className="bids-section">
+                            <div className="bids-header">
+                                <h2 className="bids-title">История ставок</h2>
+                                <span className="bids-count">{bids.length}</span>
                             </div>
-                            <div className="bid-amount">70 000 ₽</div>
-                        </div>
 
-                        <div className="bid-item">
-                            <div className="bid-user">
-                                <div className="bid-avatar">JD</div>
-                                <div className="bid-details">
-                                    <span className="bid-username">john_doe</span>
-                                    <span className="bid-time">5 часов назад</span>
+                            <div className="bids-list">
+                                <div className="bid-item highest-bid-item">
+                                    <div className="bid-user">
+                                        <div className="bid-avatar">BB</div>
+                                        <div className="bid-details">
+                                            <span className="bid-username">{bids[0]}</span>
+                                            <span className="bid-time">2 часа назад</span>
+                                        </div>
+                                        <span className="highest-badge">🏆 Лидирует</span>
+                                    </div>
+                                    <div className="bid-amount">70 000 ₽</div>
                                 </div>
-                            </div>
-                            <div className="bid-amount">68 000 ₽</div>
-                        </div>
 
-                        <div className="bid-item">
-                            <div className="bid-user">
-                                <div className="bid-avatar">AL</div>
-                                <div className="bid-details">
-                                    <span className="bid-username">alice_tech</span>
-                                    <span className="bid-time">1 день назад</span>
+                                <div className="bid-item">
+                                    <div className="bid-user">
+                                        <div className="bid-avatar">JD</div>
+                                        <div className="bid-details">
+                                            <span className="bid-username">john_doe</span>
+                                            <span className="bid-time">5 часов назад</span>
+                                        </div>
+                                    </div>
+                                    <div className="bid-amount">68 000 ₽</div>
                                 </div>
                             </div>
-                            <div className="bid-amount">67 000 ₽</div>
                         </div>
-
-                        <div className="bid-item">
-                            <div className="bid-user">
-                                <div className="bid-avatar">MK</div>
-                                <div className="bid-details">
-                                    <span className="bid-username">mike_k</span>
-                                    <span className="bid-time">1 день назад</span>
-                                </div>
-                            </div>
-                            <div className="bid-amount">66 000 ₽</div>
-                        </div>
-
-                        <div className="bid-item">
-                            <div className="bid-user">
-                                <div className="bid-avatar">ST</div>
-                                <div className="bid-details">
-                                    <span className="bid-username">sarah_tech</span>
-                                    <span className="bid-time">2 дня назад</span>
-                                </div>
-                            </div>
-                            <div className="bid-amount">65 500 ₽</div>
-                        </div>
-                    </div>
-                </div> 
-                
-                
-                </>)}
-                    
+                    </>)}
             </div>
         </div>
     )
