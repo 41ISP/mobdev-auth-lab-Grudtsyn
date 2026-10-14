@@ -9,17 +9,20 @@ import Login from "./pages/Login.jsx"
 import MyBids from "./pages/MyBids.jsx"
 import Logout from "./pages/Logout.jsx"
 import ItemDetail from "./pages/ItemDetail.jsx"
+import CreateItem from "./components/CreateItem.jsx"
+import AuthGuard from "./components/AuthGuard.jsx"
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <BrowserRouter>
+        <BrowserRouter basename="/mobdev-auth-lab-Grudtsyn">
             <Routes>
                 <Route path="" element={<Layout />}>
                     <Route index element={<ItemsList />} />
                     <Route path="register" element={<Register />} />
                     <Route path="login" element={<Login />} />
-                    <Route path="bids" element={<MyBids />} />
+                    <Route path="bids" element={<AuthGuard><MyBids /></AuthGuard>} />
                     <Route path="item/:id" element={<ItemDetail />} />
+                    <Route path="create-item" element={<AuthGuard><CreateItem /></AuthGuard>} />
                 </Route>
                 <Route path="/logout" element={<Logout />} />
             </Routes>
