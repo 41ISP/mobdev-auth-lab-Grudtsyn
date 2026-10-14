@@ -14,7 +14,7 @@ import AuthGuard from "./components/AuthGuard.jsx"
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        <BrowserRouter>
+        <BrowserRouter basename="/mobdev-auth-lab-Grudtsyn">
             <Routes>
                 <Route path="" element={<Layout />}>
                     <Route index element={<ItemsList />} />
