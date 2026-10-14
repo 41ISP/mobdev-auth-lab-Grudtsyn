@@ -50,7 +50,7 @@ const createBid = async ({id, amount}) => {
 }
 
 const deleteItems = async ({id}) => {
-    const res = await apiInstance.delete(`/items${id}`)
+    const res = await apiInstance.delete(`/items/${id}`)
     return res.data
 }
 
@@ -65,7 +65,7 @@ const getStats = async () => {
 }
 
 const getMyBids = async () => {
-    const res = await apiInstance.get("/stats")
+    const res = await apiInstance.get("/bids/my")
     return res
 }
 

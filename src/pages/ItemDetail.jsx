@@ -1,9 +1,10 @@
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import Input from "../components/Input"
 import Button from "../components/Button"
 import { useEffect, useState } from "react"
 import { api } from "../api/api"
 import { useItemsStore } from "../../store/useItemsStore"
+import { useUserStore } from "../../store/useUserStore"
 
 const ItemDetail = () => {
     const { id } = useParams()
@@ -12,6 +13,9 @@ const ItemDetail = () => {
     const [error, setError] = useState(null)
     const [bids, setBids] = useState([])
     const [timerId, setTimerId] = useState(undefined)
+    const {session} = useUserStore()
+    const [isOwner, setIsOwner] = useState(undefined)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const load = async () => {
@@ -50,6 +54,9 @@ const ItemDetail = () => {
         }
 
     }, [])
+    useEffect(() => {
+        session && item && setIsOwner(session?.user?.id === item.userId)
+    }, [item, session])
     const handleBid = async (e) => {
         e.preventDefault()
         setError('')
@@ -63,6 +70,16 @@ const ItemDetail = () => {
             await api.getItems()
         } catch (err) {
             setError(err?.message ?? String(err))
+        }
+    }
+    const handleDelete = async (e) => {
+        e.preventDefault()
+        try {
+            await api.deleteItems({id})
+            await useItemsStore.getState().getItems()
+            navigate("/")
+        } catch(error) {
+            console.error(error)
         }
     }
     if (!item) return <div className="container">Загрузка...</div>
@@ -115,6 +132,11 @@ const ItemDetail = () => {
                                         step="100"
                                     />
                                     <Button type="submit" className="btn-bid">Сделать ставку</Button>
+                                     {isOwner && (
+                                <Button onClick={handleDelete} type="button" className="btn-delete" >
+                                    Удалить товар
+                                </Button>
+                            )}
                                 </form>
                             </div>
 
@@ -127,28 +149,29 @@ const ItemDetail = () => {
                             </div>
 
                             <div className="bids-list">
-                                <div className="bid-item highest-bid-item">
-                                    <div className="bid-user">
-                                        <div className="bid-avatar">BB</div>
-                                        <div className="bid-details">
-                                            <span className="bid-username">{bids[0]}</span>
-                                            <span className="bid-time">2 часа назад</span>
+                                {bids.length === 0 && <p>Ставок пока нет</p>}
+                                {bids.map((bid, index) => (
+                                    <div
+                                        className={`bid-item ${index === 0 ? "highest-bid-item" : ""}`}
+                                        key={bid.id}
+                                    >
+                                        <div className="bid-user">
+                                            <div className="bid-avatar">
+                                                {bid.username?.slice(0, 2).toUpperCase()}
+                                            </div>
+                                            <div className="bid-details">
+                                                <span className="bid-username">{bid.username}</span>
+                                                <span className="bid-time">
+                                                    {new Date(bid.createdAt).toLocaleString("ru-RU")}
+                                                </span>
+                                            </div>
+                                            {index === 0 && (
+                                                <span className="highest-badge">🏆 Лидирует</span>
+                                            )}
                                         </div>
-                                        <span className="highest-badge">🏆 Лидирует</span>
+                                        <div className="bid-amount">{bid.amount} ₽</div>
                                     </div>
-                                    <div className="bid-amount">70 000 ₽</div>
-                                </div>
-
-                                <div className="bid-item">
-                                    <div className="bid-user">
-                                        <div className="bid-avatar">JD</div>
-                                        <div className="bid-details">
-                                            <span className="bid-username">john_doe</span>
-                                            <span className="bid-time">5 часов назад</span>
-                                        </div>
-                                    </div>
-                                    <div className="bid-amount">68 000 ₽</div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </>)}
